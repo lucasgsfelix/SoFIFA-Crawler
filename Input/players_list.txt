@@ -1,0 +1,47 @@
+Player	SoFIFA ID
+Cristiano Ronaldo	20801
+Neymar	190871
+Andrés Iniesta	41
+Mesut Özil	176635
+Gerard Piqué	152729
+James Rodríguez	198710
+Gareth Bale	173731
+Radamel Falcao	167397
+Wayne Rooney	54050
+Sergio Ramos	155862
+Luis Suárez	176580
+Sergio Agüero	153079
+David De Gea	193080
+Marcelo	176676
+Cesc Fàbregas	162895
+Karim Benzema	165153
+Mohamed Salah	209331
+Javier Hernández	178224
+Dani Alves	146530
+Juan Mata	178088
+Toni Kroos	182521
+Paul Pogba	195864
+Gonzalo Higuaín	167664
+Eden Hazard	183277
+Antoine Griezmann	194765
+Zlatan Ibrahimovic	41236
+Raphaël Varane	201535
+Isco	197781
+Ezequiel Lavezzi	159065
+Bastian Schweinsteiger	121944
+Pedro	210514
+Oscar	188152
+Álvaro Morata	201153
+Mario Götze	192318
+Arturo Vidal	181872
+Thomas Müller	189596
+Manuel Neuer	167495
+Juan Cuadrado	193082
+David Silva	168542
+Mario Balotelli	186627
+Jack Wilshere	189461
+Daniel Carvajal	204963
+Fernando Torres	49369
+David Luiz	179944
+David Villa	113422
+Javier Mascherano	142754
