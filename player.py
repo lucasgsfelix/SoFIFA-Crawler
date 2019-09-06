@@ -5,10 +5,18 @@ import parser
 
 def get_player(player_id, player_name):
     """Return all info of a player."""
+
     link = parser.mount_player_link(player_id)
     page = parser.get_page(link)
     basic_info = get_basic_info(page, player_name, player_id)
     teams_info = get_player_team_info(page)
+    get_attacking_info()
+    get_defensive_info()
+    get_skill_info()
+    get_power_info()
+    get_mentality_info()
+    get_goalkeeping_info()
+    get_movement_info()
 
 
 def get_basic_info(page, player_name, player_id):
