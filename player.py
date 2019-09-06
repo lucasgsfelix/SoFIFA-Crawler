@@ -50,12 +50,35 @@ def get_basic_info(page, player_name, player_id):
     token = r'Wage&nbsp;[\n\t]*<span>'
     info['Wage'] = parser.retrieve_in_tags(token, '<', page)[0]
 
+    token = "Preferred Foot</label>"
+    info['Foot'] = parser.retrieve_in_tags(token, '<', page)[0]
+
+    token = "International Reputation</label>"
+    info['Intern. Rep.'] = parser.retrieve_in_tags(token, '<',
+                                                   page)[0]
+
+    token = 'Weak Foot</label>'
+    info['Weak Foot'] = parser.retrieve_in_tags(token, '<',
+                                                page)[0]
+
+    token = "Skill Moves</label>"
+    info['Skills Moves'] = parser.retrieve_in_tags(token, '<',
+                                                   page)[0]
+
+    token = "Work Rate</label><span>"
+    info['Work Rate'] = parser.retrieve_in_tags(token, '<',
+                                                page)[0]
+
+    token = "Release Clause</label><span>"
+    info['Release Clause'] = parser.retrieve_in_tags(token, '<',
+                                                     page)[0]
+
     return info
 
 
 def get_player_team_info(page):
     """ Get the info of teams that a athlete plays."""
-    info = {}
+
     start_token = r'a href="\/team\/[\d]+\/[\w]+\/"'
     start_token = re.compile(start_token)
     end_token = "</figure>"
@@ -66,7 +89,7 @@ def get_player_team_info(page):
     if len(pages) >= 2:  # there is a national team
         end_token = "/li></ul></div></div>"
         pages = parser.retrieve_in_tags(start_token,
-                                        end_token, page)[0]
+                                        end_token, page)[1]
         national_info = _national_team_info(pages)
 
         return {**team_info, **national_info}
@@ -224,23 +247,50 @@ def _principal_team_info(page):
     """
     info = {}
     info['Team'] = parser.retrieve_in_tags(">", "<", page)[0]
-    info['Team Position'] = parser.retrieve_in_tags
 
-    token = r'span class="bp3-tag p p[\d]*>'
+    token = r'class="pos pos[\d]*">'
+    token = re.compile(token)
+    info['Team Position'] = parser.retrieve_in_tags(token,
+                                                    '<', page)[0]
+
+    token = r'span class="bp3-tag p p[\d]*">'
     token = re.compile(token)
     info['Team Skill'] = parser.retrieve_in_tags(token, '<',
-                                                 page)
+                                                 page)[0]
 
     token = "Jersey Number</label>"
-    info['Jersey Team'] = parser.retrieve_in_tags(token, "<", page)
+    info['Jersey'] = parser.retrieve_in_tags(token, "<", page)[0]
 
     token = "Joined</label>"
-    info['Joined'] = parser.retrieve_in_tags(token, '<', page)
+    info['Joined'] = parser.retrieve_in_tags(token, '<', page)[0]
 
     token = "Contract Valid Until</label>"
-    info['Contract'] = parser.retrieve_in_tags(token, '<', page)
+    info['Contract'] = parser.retrieve_in_tags(token, '<', page)[0]
 
     return info
 
+
 def _national_team_info(page):
-    """ Get the player national team info."""
+    """ Get the player national team info.
+        Nat. Team
+        Jersey Nat.
+        Nat. Position
+        Nat. Team Skill
+    """
+    info = {}
+    info['Nat. Team'] = parser.retrieve_in_tags(">", "<", page)[0]
+
+    token = "Jersey Number</label>"
+    info['Jersey Nat.'] = parser.retrieve_in_tags(token, "<", page)[0]
+
+    token = r'class="pos pos[\d]*">'
+    token = re.compile(token)
+    info['Nat. Position'] = parser.retrieve_in_tags(token,
+                                                    '<', page)[0]
+
+    token = r'span class="bp3-tag p p[\d]*">'
+    token = re.compile(token)
+    info['Nat. Team Skill'] = parser.retrieve_in_tags(token, '<',
+                                                      page)[0]
+
+    return info
