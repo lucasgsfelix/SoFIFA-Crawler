@@ -35,6 +35,7 @@ def get_page(link):
     os.system('rm auxiliary.html')
     return info
 
+
 def _match_positions(start_list, end_list):
     """ Match start and end positions. """
 
@@ -61,7 +62,6 @@ def retrieve_in_tags(start_token, end_token, page, parse=False):
         return parsed values
     """
     start_pos = [(a.end()) for a in list(re.finditer(start_token, page))]
-
     if not start_pos:
         return None
 
@@ -146,6 +146,7 @@ def remove_tokens(page, tokens):
 
     return ''.join(page)
 
+
 def get_unparsed_text(page, token):
     """ Return unparsed text given a regex or string"""
     start = [(a.start()) for a in list(re.finditer(token, page))]
@@ -154,4 +155,3 @@ def get_unparsed_text(page, token):
     pages = list(map(lambda x: page[x:positions[x]], positions))
 
     return pages
-

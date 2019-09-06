@@ -35,9 +35,7 @@ def get_basic_info(page, player_name, player_id):
     """
     info = {}
     info['Name'] = player_name
-
-    token = 'class="meta bp3-text-overflow-ellipsis">'
-    info['Complete Name'] = parser.retrieve_in_tags(token, '<', page)
+    info['Complete Name'] = _get_complete_name(page)
     info['Id'] = player_id
     info = _get_edition_release(page, info)
     info['Position'] = _get_position(page)
@@ -47,17 +45,14 @@ def get_basic_info(page, player_name, player_id):
     info['Weight'] = _get_weight(page)
 
     token = r'Value&nbsp;[\n\t]*<span>'
-    info['Value'] = parser.retrieve_in_tags(token, '<', page)
+    info['Value'] = parser.retrieve_in_tags(token, '<', page)[0]
     token = r'Wage&nbsp;[\n\t]*<span>'
-    info['Wage'] = parser.retrieve_in_tags(token, '<', page)
-
-    print(info)
-
-
+    info['Wage'] = parser.retrieve_in_tags(token, '<', page)[0]
 
 
 def get_teams_info(page):
     """ Get the info of teams that a athlete plays."""
+
 
 def get_defensive_info(page):
     """ Get a player defensive skills."""
@@ -119,21 +114,25 @@ def _get_position(page):
     token_re = r'class="pos pos[\d]*">[A-Z]*</span></li>'
     token_re = re.compile(token_re)
     positions = parser.get_unparsed_text(page, token_re)
+
     pos = []
-
     for position in positions:
-        pos.append(parser.retrieve_in_tags(position, '>', '<'))
+        ans = parser.retrieve_in_tags('>', '<', position)[0]
+        if ans is not None:
+            pos.append(ans)
 
-    return ' '.join(pos)
+    return ' '.join(ans)
 
 
 def _get_birth_date(page):
     """ Getting and parsing the birth date of a player."""
     token_re = r'class="pos pos[\d]*">[A-Z]*</span>[\',"()\d A-z]*</div>'
     token_re = re.compile(token_re)
-    date = paser.get_unparsed_text(page, token_re)[0]
-    date = parser.retrieve_in_tags("</span>", '</div>', date)
-    date = parser.retrieve_in_tags('(', ')', date)
+    date = parser.get_unparsed_text(page, token_re)[0]
+    date = parser.retrieve_in_tags("</span>", '</div>', date)[0]
+    re_one = re.compile(r'\(')
+    re_two = re.compile(r'\)')
+    date = parser.retrieve_in_tags(re_one, re_two, date)[0]
 
     return date
 
@@ -144,38 +143,47 @@ def _get_edition_release(page, info):
     aux = parser.retrieve_in_tags(token, '<', page)[0]
     aux = aux.split(' ')
 
-    aux.pop(0) # Removing the tag FIFA
+    aux.pop(0)  # Removing the tag FIFA
     info['Edition'] = aux[0]
 
-    aux.pop(0) # Removing the edition
+    aux.pop(0)  # Removing the edition
     info['Release'] = ''.join(aux)
 
     return info
 
+
 def _get_birth_place(page):
     """ Getting the birth place of a player"""
     token_re = r'title="[A-z]*"><img alt="" src=""'
-    token_re += r'data-src="https://cdn.sofifa.org/flags/[\d]*.png'
+    token_re += r' data-src="https://cdn.sofifa.org/flags/[\d]*.png'
     token_re = re.compile(token_re)
-    place = paser.get_unparsed_text(page, token_re)[0]
+    place = parser.get_unparsed_text(page, token_re)[0]
 
-    return parser.retrieve_in_tags('title="', '"', page)
+    return parser.retrieve_in_tags('title="', '"', place)[0]
+
 
 def _get_weight(page):
     """Returns the players weight."""
     token = r'class="pos pos[\d]*">[A-Z]*</span>'
-    token += r'[A-z\',"\(\d ]*\) [\d]*\'[\d]*\"'
+    token += r' .*\) [\d]*\'[\d]*\" [\w]*</div>'
     token = re.compile(token)
-    weight = parser.get_unparsed_text(token, page)[0]
+    weight = parser.get_unparsed_text(page, token)[0]
 
-    return weight.retrieve_in_tags('" ', '<')
+    return parser.retrieve_in_tags('" ', '<', weight)[0]
 
 
 def _get_height(page):
     """Returns the players height"""
     token = r'class="pos pos[\d]*">[A-Z]*</span>'
-    token += r'[A-z\',"\(\d ]*\) [\d]*\'[\d]*\"'
+    token += r' .*\) [\d]*\'[\d]*\"'
     token = re.compile(token)
-    height = parser.get_unparsed_text(token, page)[0]
+    height = parser.get_unparsed_text(page, token)[0]
 
-    return height.split(') ', ' ')[0]
+    return parser.retrieve_in_tags(r'\) ', '"', height)[0] + '"'
+
+
+def _get_complete_name(page):
+    """Return the complete of the player."""
+    token = 'class="meta bp3-text-overflow-ellipsis">'
+    name = parser.retrieve_in_tags(token, '<', page)
+    return name[0][:-1]
