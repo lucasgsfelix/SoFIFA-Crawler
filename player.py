@@ -7,7 +7,8 @@ def get_player(player_id, player_name):
     """Return all info of a player."""
     link = parser.mount_player_link(player_id)
     page = parser.get_page(link)
-    get_basic_info(page, player_name, player_id)
+    basic_info = get_basic_info(page, player_name, player_id)
+    teams_info = get_player_team_info(page)
 
 
 def get_basic_info(page, player_name, player_id):
@@ -49,9 +50,32 @@ def get_basic_info(page, player_name, player_id):
     token = r'Wage&nbsp;[\n\t]*<span>'
     info['Wage'] = parser.retrieve_in_tags(token, '<', page)[0]
 
+    return info
 
-def get_teams_info(page):
+
+def get_player_team_info(page):
     """ Get the info of teams that a athlete plays."""
+    info = {}
+    start_token = r'a href="\/team\/[\d]+\/[\w]+\/"'
+    start_token = re.compile(start_token)
+    end_token = "</figure>"
+    pages = parser.retrieve_in_tags(start_token,
+                                    end_token, page)[0]
+    team_info = _principal_team_info(pages)
+
+    if len(pages) >= 2:  # there is a national team
+        end_token = "/li></ul></div></div>"
+        pages = parser.retrieve_in_tags(start_token,
+                                        end_token, page)[0]
+        national_info = _national_team_info(pages)
+
+        return {**team_info, **national_info}
+
+    return team_info
+
+
+def get_players_national_team_info(page):
+    """" Get the info of national team."""
 
 
 def get_defensive_info(page):
@@ -187,3 +211,36 @@ def _get_complete_name(page):
     token = 'class="meta bp3-text-overflow-ellipsis">'
     name = parser.retrieve_in_tags(token, '<', page)
     return name[0][:-1]
+
+
+def _principal_team_info(page):
+    """ Return the basic info of a players team.
+        Team
+        Team Position
+        Team Skill
+        Jersey Team
+        Joined
+        Contract
+    """
+    info = {}
+    info['Team'] = parser.retrieve_in_tags(">", "<", page)[0]
+    info['Team Position'] = parser.retrieve_in_tags
+
+    token = r'span class="bp3-tag p p[\d]*>'
+    token = re.compile(token)
+    info['Team Skill'] = parser.retrieve_in_tags(token, '<',
+                                                 page)
+
+    token = "Jersey Number</label>"
+    info['Jersey Team'] = parser.retrieve_in_tags(token, "<", page)
+
+    token = "Joined</label>"
+    info['Joined'] = parser.retrieve_in_tags(token, '<', page)
+
+    token = "Contract Valid Until</label>"
+    info['Contract'] = parser.retrieve_in_tags(token, '<', page)
+
+    return info
+
+def _national_team_info(page):
+    """ Get the player national team info."""
