@@ -10,13 +10,17 @@ def get_player(player_id, player_name):
     page = parser.get_page(link)
     basic_info = get_basic_info(page, player_name, player_id)
     teams_info = get_player_team_info(page)
-    get_attacking_info(page)
-    get_defensive_info(page)
-    get_skill_info(page)
-    get_power_info(page)
-    get_mentality_info(page)
-    get_goalkeeping_info(page)
-    get_movement_info(page)
+    attack_info = get_attacking_info(page)
+    def_info = get_defensive_info(page)
+    skill_info = get_skill_info(page)
+    power_info = get_power_info(page)
+    mental_info = get_mentality_info(page)
+    goal_info = get_goalkeeping_info(page)
+    move_info = get_movement_info(page)
+
+    return {**basic_info, **teams_info, **attack_info,
+            **def_info, **skill_info, **power_info,
+            **mental_info, **goal_info, **move_info}
 
 
 def get_basic_info(page, player_name, player_id):

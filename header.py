@@ -19,3 +19,4 @@ PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release", "Birth Date",
            "Marking", "St. Tackle", "Sliding Tackle", "GK Diving", "GK Hand.",
            "GK Kicking", "GK Positioning", "GK Reflexes", "Tags",
            "# of Injuries", "# of Expulsions", "# of Titles"]
+
