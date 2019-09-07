@@ -10,13 +10,13 @@ def get_player(player_id, player_name):
     page = parser.get_page(link)
     basic_info = get_basic_info(page, player_name, player_id)
     teams_info = get_player_team_info(page)
-    get_attacking_info()
-    get_defensive_info()
-    get_skill_info()
-    get_power_info()
-    get_mentality_info()
-    get_goalkeeping_info()
-    get_movement_info()
+    get_attacking_info(page)
+    get_defensive_info(page)
+    get_skill_info(page)
+    get_power_info(page)
+    get_mentality_info(page)
+    get_goalkeeping_info(page)
+    get_movement_info(page)
 
 
 def get_basic_info(page, player_name, player_id):
@@ -105,36 +105,89 @@ def get_player_team_info(page):
     return team_info
 
 
-def get_players_national_team_info(page):
-    """" Get the info of national team."""
-
-
 def get_defensive_info(page):
-    """ Get a player defensive skills."""
+    """ Get a player defensive skills.
+        Marking
+        St. Tackle
+        Sliding Tackle
+    """
 
 
 def get_attacking_info(page):
-    """Get a player attacking skills."""
+    """Get a player attacking skills.
+        Crossing
+        Finishing
+        Heading Accuracy
+        Short Passing
+        Volleys
+    """
+    token = '<h5 class="bp3-heading">Attacking</h5>'
+    attack_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    skills = parser.retrieve_in_tags('>', '<', attack_page)
+
+    skills = list(filter(lambda x : 
+        (re.match(r'[\d]+', x) or re.match(r'[A-z ]+', x))
+        and x != " ", skills))
+
+    info = {}
+    index = 0
+    while index < len(skills) - 1:
+        info[skills[index+1]] = skills[index]
+        index = index + 2
+
+    return info
 
 
 def get_skill_info(page):
-    """Get a player skills info."""
+    """Get a player skills info.
+        Dribbling
+        Curve
+        FK Accuracy
+        Long Pass
+        Ball Control
+    """
 
 
 def get_movement_info(page):
-    """Get a player movement skills."""
+    """Get a player movement skills.
+        Acceleration
+        Sprint Speed
+        Agility
+        Reactions
+        Balance
+    """
 
 
 def get_power_info(page):
-    """Get a player power skills."""
+    """Get a player power skills.
+        Shot Power
+        Jumping
+        Stamina
+        Strength
+        Long Shots
+    """
 
 
 def get_mentality_info(page):
-    """Get a player mentality skills."""
+    """Get a player mentality skills.
+        Aggression
+        Interceptions
+        Positioning
+        Vision
+        Penalties
+        Composure
+    """
 
 
 def get_goalkeeping_info(page):
-    """Get a player goalkeeping skills."""
+    """Get a player goalkeeping skills.
+        GK Diving
+        GK Handling
+        GK Kicking
+        GK Positioning
+        GK Reflexes
+    """
 
 
 def get_additional_info(link):
