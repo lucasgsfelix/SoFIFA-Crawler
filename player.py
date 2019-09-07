@@ -111,6 +111,10 @@ def get_defensive_info(page):
         St. Tackle
         Sliding Tackle
     """
+    token = '<h5 class="bp3-heading">Defending</h5>'
+    def_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(def_page)
 
 
 def get_attacking_info(page):
@@ -124,19 +128,7 @@ def get_attacking_info(page):
     token = '<h5 class="bp3-heading">Attacking</h5>'
     attack_page = parser.retrieve_in_tags(token, '</div>', page)[0]
 
-    skills = parser.retrieve_in_tags('>', '<', attack_page)
-
-    skills = list(filter(lambda x : 
-        (re.match(r'[\d]+', x) or re.match(r'[A-z ]+', x))
-        and x != " ", skills))
-
-    info = {}
-    index = 0
-    while index < len(skills) - 1:
-        info[skills[index+1]] = skills[index]
-        index = index + 2
-
-    return info
+    return _parse_skills(attack_page)
 
 
 def get_skill_info(page):
@@ -147,6 +139,10 @@ def get_skill_info(page):
         Long Pass
         Ball Control
     """
+    token = '<h5 class="bp3-heading">Skill</h5>'
+    skill_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(skill_page)
 
 
 def get_movement_info(page):
@@ -157,6 +153,10 @@ def get_movement_info(page):
         Reactions
         Balance
     """
+    token = '<h5 class="bp3-heading">Movement</h5>'
+    mov_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(mov_page)
 
 
 def get_power_info(page):
@@ -167,6 +167,10 @@ def get_power_info(page):
         Strength
         Long Shots
     """
+    token = '<h5 class="bp3-heading">Power</h5>'
+    power_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(power_page)
 
 
 def get_mentality_info(page):
@@ -178,6 +182,10 @@ def get_mentality_info(page):
         Penalties
         Composure
     """
+    token = '<h5 class="bp3-heading">Mentality</h5>'
+    mental_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(mental_page)
 
 
 def get_goalkeeping_info(page):
@@ -188,6 +196,10 @@ def get_goalkeeping_info(page):
         GK Positioning
         GK Reflexes
     """
+    token = '<h5 class="bp3-heading">Goalkeeping</h5>'
+    goal_page = parser.retrieve_in_tags(token, '</div>', page)[0]
+
+    return _parse_skills(goal_page)
 
 
 def get_additional_info(link):
@@ -353,5 +365,23 @@ def _national_team_info(page):
     token = re.compile(token)
     info['Nat. Team Skill'] = parser.retrieve_in_tags(token, '<',
                                                       page)[0]
+
+    return info
+
+
+def _parse_skills(page):
+    """ """
+    skills = parser.retrieve_in_tags('>', '<', page)
+
+    skills = list(filter(lambda x: x != " " and
+                         (re.match(r'[\d]+', x)
+                          or re.match(r'[A-z ]+', x)),
+                         skills))
+
+    info = {}
+    index = 0
+    while index < len(skills) - 1:
+        info[skills[index+1]] = skills[index]
+        index = index + 2
 
     return info
