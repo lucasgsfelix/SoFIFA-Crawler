@@ -13,10 +13,11 @@ def mount_query_link(player_name):
     return link + player_name
 
 
-def mount_player_link(player_id):
+def mount_player_link(player_id, edition, release):
     """ Link of player general info."""
 
-    return "https://sofifa.com/player/" + str(player_id)
+    link = "https://sofifa.com/player/" + str(player_id)
+    return link + '/' + edition + '/' + release + '/'
 
 
 def mount_player_life_link(player_id):
@@ -24,6 +25,13 @@ def mount_player_life_link(player_id):
     link = "https://sofifa.com/player/" + str(player_id)
 
     return link + '/live'
+
+
+def mount_player_comments_link(player_id):
+    """ Mount link with comments about the player. """
+    link = "https://sofifa.com/player/" + str(player_id)
+
+    return link + '/#comments'
 
 
 def get_page(link):

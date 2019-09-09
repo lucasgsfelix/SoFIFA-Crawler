@@ -3,12 +3,24 @@ import re
 import parser
 
 
-def get_player(player_id, player_name):
+def get_players_info(player_id, player_name, edition, release):
+    """ Responsible to call"""
+    info = {}
+    info['Edition'] = edition
+    info['Release'] = release
+    info['Name'] = player_name
+    info['Id'] = player_id
+
+    link = parser.mount_player_link(player_id, edition, release)
+    page = parser.get_page(link)
+    get_player(page, info, player_id)
+
+
+def get_player(page, info, player_id):
     """Return all info of a player."""
 
-    link = parser.mount_player_link(player_id)
-    page = parser.get_page(link)
-    basic_info = get_basic_info(page, player_name, player_id)
+    basic_info = get_basic_info(page)
+    basic_info = {**basic_info, **info}
     teams_info = get_player_team_info(page)
     attack_info = get_attacking_info(page)
     def_info = get_defensive_info(page)
@@ -34,10 +46,11 @@ def get_add_info(page):
 
     sidelines_info = get_sidelines(page)
     titles_info = get_titles(page)
+
     return {**sidelines_info, **titles_info}
 
 
-def get_basic_info(page, player_name, player_id):
+def get_basic_info(page):
     """ Get a player basic info.
         Here we will get:
         - Name
@@ -61,9 +74,7 @@ def get_basic_info(page, player_name, player_id):
         - Release Clause
     """
     info = {}
-    info['Name'] = player_name
     info['Complete Name'] = _get_complete_name(page)
-    info['Id'] = player_id
     info = _get_edition_release(page, info)
     info['Position'] = _get_position(page)
     info['Birth Date'] = _get_birth_date(page)
@@ -307,7 +318,7 @@ def get_titles(page):
     return sideline
 
 
-def get_comments(link):
+def get_comments(page):
     """Get users comments in a player page."""
     # TODO
 
