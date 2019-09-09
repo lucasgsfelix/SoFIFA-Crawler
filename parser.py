@@ -19,11 +19,11 @@ def mount_player_link(player_id):
     return "https://sofifa.com/player/" + str(player_id)
 
 
-def mount_player_life_link(player_id, player_name):
+def mount_player_life_link(player_id):
     """ Link of real life info."""
     link = "https://sofifa.com/player/" + str(player_id)
 
-    return link + '/' + player_name.replace(' ', '-') + '/live'
+    return link + '/live'
 
 
 def get_page(link):
@@ -62,6 +62,7 @@ def retrieve_in_tags(start_token, end_token, page, parse=False):
         return parsed values
     """
     start_pos = [(a.end()) for a in list(re.finditer(start_token, page))]
+
     if not start_pos:
         return None
 

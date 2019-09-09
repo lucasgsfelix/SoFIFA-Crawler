@@ -17,10 +17,24 @@ def get_player(player_id, player_name):
     mental_info = get_mentality_info(page)
     goal_info = get_goalkeeping_info(page)
     move_info = get_movement_info(page)
+    tags_info = get_tags(page)
+
+    link = parser.mount_player_life_link(player_id)
+    page = parser.get_page(link)
+    add_info = get_add_info(page)
 
     return {**basic_info, **teams_info, **attack_info,
             **def_info, **skill_info, **power_info,
-            **mental_info, **goal_info, **move_info}
+            **mental_info, **goal_info, **move_info,
+            **tags_info, **add_info}
+
+
+def get_add_info(page):
+    """ Getting additional info. """
+
+    sidelines_info = get_sidelines(page)
+    titles_info = get_titles(page)
+    return {**sidelines_info, **titles_info}
 
 
 def get_basic_info(page, player_name, player_id):
@@ -88,6 +102,18 @@ def get_basic_info(page, player_name, player_id):
     return info
 
 
+def get_tags(page):
+    """ Get tags with players topics."""
+
+    info = {}
+    token = '<div class="mt-2">'
+    tags = parser.retrieve_in_tags(token, "</div>", page)[0]
+    tags = parser.retrieve_in_tags("#", "<", tags)
+    info['Tags'] = tags
+
+    return info
+
+
 def get_player_team_info(page):
     """ Get the info of teams that a athlete plays."""
 
@@ -98,15 +124,17 @@ def get_player_team_info(page):
                                     end_token, page)[0]
     team_info = _principal_team_info(pages)
 
+    national_info = {"Nat. Team": None,
+                     "Jersey Nat.": None,
+                     "Nat. Position": None,
+                     "Nat. Team Skill": None}
     if len(pages) >= 2:  # there is a national team
         end_token = "/li></ul></div></div>"
         pages = parser.retrieve_in_tags(start_token,
                                         end_token, page)[1]
         national_info = _national_team_info(pages)
 
-        return {**team_info, **national_info}
-
-    return team_info
+    return {**team_info, **national_info}
 
 
 def get_defensive_info(page):
@@ -206,12 +234,80 @@ def get_goalkeeping_info(page):
     return _parse_skills(goal_page)
 
 
-def get_additional_info(link):
-    """Get a player carrer info as injuries and titles."""
+def get_sidelines(page):
+    """Get injuries and expulsions."""
+
+    start = '<h4 class="bp3-heading">Sidelined</h4>'
+    end = '</table></div></article>'
+    tokens = ['Description', 'Start Date', 'End Date']
+    add_info = _add_info_parser(start, end, page, tokens)
+
+    info = []
+    for index in range(0, len(add_info), 2):
+        sideline = {}
+        sideline['Sideline'] = add_info[index]
+        sideline['Date'] = add_info[index+1]
+        info.append(sideline)
+
+    sideline = {}
+    sideline['Sidelines'] = info
+
+    return sideline
+
+
+def _add_info_parser(start, end, page, tokens):
+    """Return the fileds of additional info"""
+
+    add_info = parser.retrieve_in_tags(start, end, page)[0]
+    add_info = parser.retrieve_in_tags('>', '<', add_info)
+    add_info = list(filter(lambda x: '>' not in x and
+                           x not in tokens
+                           and not re.match(r'[\s,]+', x),
+                           add_info))
+    return add_info
+
+
+def get_titles(page):
+    """Get a player earned titles"""
+
+    start = '<h4 class="bp3-heading">Trophies</h4>'
+    end = '<div class="spacing">'
+    tokens = ['Club Domestic']
+    add_info = _add_info_parser(start, end, page, tokens)
+
+
+    info = []
+    # League, State, \# Winnings, \# Competition, Seasons
+    flag = True
+    for token in add_info:
+        if re.match(r'[\d]+x', token):
+            #  Will be the number of winning ou runner-up
+            continue
+        elif re.match(r'[\d]{4}\/[\d]{4}', token) or re.match(r'[\d]{4}', token):
+            # The season as winner ou runner-up
+            seasons.append(token)
+        elif token.lower() in ('winner', 'runner-up'):
+            # He win a competition
+            state = token
+        else:
+            # will be name of the competition
+            if not flag:
+                titles[state] = seasons
+                info.append(titles)
+
+            flag = False
+            titles, seasons = {}, []
+            titles['League'] = token.replace('  ', '')
+
+    sideline = {}
+    sideline['Competitions'] = info
+
+    return sideline
 
 
 def get_comments(link):
     """Get users comments in a player page."""
+    # TODO
 
 
 def get_id_by_name(name):

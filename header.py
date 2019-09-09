@@ -11,12 +11,11 @@ PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release", "Birth Date",
            "Nat. Team Skill",
            "Jersey", "Joined", "Contract", "Nat. Team", "Jersey Nat.",
            "Nat. Position", "Overall", "Potential", "Crossing", "Finishing",
-           "Heading", "Short Pass", "Volleys", "Dribbling", "Curve",
-           "FK Accuracy", "Long Pass", "Ball Control", "Acceleration",
+           "Heading", "Short Passing", "Volleys", "Dribbling", "Curve",
+           "FK Accuracy", "Long Passing", "Ball Control", "Acceleration",
            "Sprint Speed", "Agility", "Reactions", "Balance", "Shot Power",
            "Jumping", "Stamina", "Strength", "Long Shots", "Aggression",
            "Interceptions", "Positioning", "Vision", "Penalties", "Composure",
-           "Marking", "St. Tackle", "Sliding Tackle", "GK Diving", "GK Hand.",
-           "GK Kicking", "GK Positioning", "GK Reflexes", "Tags",
-           "# of Injuries", "# of Expulsions", "# of Titles"]
-
+           "Marking", "Standing Tackle", "Sliding Tackle", "GK Diving",
+           "GK Handling", "GK Kicking", "GK Positioning", "GK Reflexes",
+           "Tags", "# of Injuries", "# of Expulsions", "# of Titles"]
