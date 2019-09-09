@@ -275,15 +275,17 @@ def get_titles(page):
     tokens = ['Club Domestic']
     add_info = _add_info_parser(start, end, page, tokens)
 
-
-    info = []
+    info, seasons, titles = [], [], {}
     # League, State, \# Winnings, \# Competition, Seasons
     flag = True
     for token in add_info:
         if re.match(r'[\d]+x', token):
             #  Will be the number of winning ou runner-up
             continue
-        elif re.match(r'[\d]{4}\/[\d]{4}', token) or re.match(r'[\d]{4}', token):
+        elif re.match(r'[\d]{4}\/[\d]{4}', token):
+            # The season as winner ou runner-up
+            seasons.append(token)
+        elif re.match(r'[\d]{4}', token):
             # The season as winner ou runner-up
             seasons.append(token)
         elif token.lower() in ('winner', 'runner-up'):
