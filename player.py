@@ -79,7 +79,7 @@ def get_basic_info(page):
     """
     info = {}
     info['Complete Name'] = _get_complete_name(page)
-    info = _get_edition_release(page, info)
+    info['Release Date'] = _get_edition_release(page)
     info['Position'] = _get_position(page)
     info['Birth Date'] = _get_birth_date(page)
     info['Birth Place'] = _get_birth_place(page)
@@ -415,19 +415,16 @@ def _get_birth_date(page):
     return date
 
 
-def _get_edition_release(page, info):
+def _get_edition_release(page):
     """Returns the edition and release of FIFA"""
     token = 'class="bp3-tag bp3-minimal bp3-intent-success">'
     aux = parser.retrieve_in_tags(token, '<', page)[0]
     aux = aux.split(' ')
 
     aux.pop(0)  # Removing the tag FIFA
-    info['Edition'] = aux[0]
-
     aux.pop(0)  # Removing the edition
-    info['Release'] = ''.join(aux)
 
-    return info
+    return ''.join(aux)
 
 
 def _get_birth_place(page):

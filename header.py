@@ -4,9 +4,10 @@
 # Nat. Team --> Nacional Team
 # St. Tackle --> Standing Tacle
 # GK Hand --> Goalkeeper Handling
-PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release", "Birth Date",
-           "Birth Place", "Height", "Weight", "Position", "Value", "Wage",
-           "Foot", "Intern. Rep.", "Weak Foot", "Skill Moves", "Work Rate",
+PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release",
+           "Release Date", "Birth Date", "Wage", "Work Rate",
+           "Birth Place", "Height", "Weight", "Position", "Value",
+           "Foot", "Intern. Rep.", "Weak Foot", "Skill Moves",
            "Release Clause", "Team", "Team Position", "Team Skill",
            "Jersey", "Short Passing", "Contract", "Nat. Team", "Jersey Nat.",
            "Nat. Position", "Overall", "Potential", "Crossing", "Finishing",
