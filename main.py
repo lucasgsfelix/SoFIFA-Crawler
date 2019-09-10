@@ -19,8 +19,9 @@ if __name__ == '__main__':
         logs = pl.get_pages_changes(player[1])
         for log in logs:
             # player id, player name, edition, release
-            player_info = pl.get_players_info(player[1],
-                                              player[0], logs[log], log)
+            if int(logs[log]) > 14:
+                player_info = pl.get_players_info(player[1],
+                                                  player[0], logs[log], log)
 
-            parser.write_file(player_info, HEADER)
-            HEADER = False
+                parser.write_file(player_info, HEADER)
+                HEADER = False

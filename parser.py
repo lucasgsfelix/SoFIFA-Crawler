@@ -4,6 +4,10 @@ import os
 from header import PLAYERS
 
 
+class TokenNotFound(Exception):
+    """ Token not Found Exception Class."""
+
+
 def mount_query_link(player_name):
     """Mount a query link given a player name."""
 
@@ -18,7 +22,7 @@ def mount_player_link(player_id, edition, release):
     """ Link of player general info."""
 
     link = "https://sofifa.com/player/" + str(player_id)
-    return link + '/' + edition + '/' + release + '/'
+    return link + '/' + str(edition) + '/' + str(release) + '/'
 
 
 def mount_player_life_link(player_id):
@@ -46,6 +50,7 @@ def mount_player_comments_link(player_id):
 def get_page(link):
     """ Given a link it return the html page. """
     os.system('wget -O auxiliary.html ' + link + " --quiet")
+
     with open('auxiliary.html', 'r') as file:
         info = file.read()
 
@@ -177,13 +182,30 @@ def get_unparsed_text(page, token):
 
 def write_file(info, header=False):
     """ Write the dataset. """
+
     with open("Output/players_info.txt", 'a') as file:
         if header:
             _write_header(file, PLAYERS)
 
-        info = list(info.values())
+        # info = list(info.values())
         # Writing the first features
-        file.write('\t'.join(info) + '\n')
+        for index, feature in enumerate(PLAYERS):
+            if isinstance(info[feature], list):
+                try:
+                    info[feature] = ' '.join(info[feature])
+                except:
+                    info[feature] = str(info[feature])
+
+            if index < len(PLAYERS) - 1:
+                if info[feature] is not None:
+                    file.write(info[feature] + "\t")
+                else:
+                    file.write("None\t")
+            else:
+                if info[feature] is not None:
+                    file.write(info[feature] + "\n")
+                else:
+                    file.write("None\t")
 
 
 def _write_header(file, header):

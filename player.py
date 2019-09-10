@@ -12,6 +12,7 @@ def get_players_info(player_id, player_name, edition, release):
     info['Release'] = release
 
     link = parser.mount_player_link(player_id, edition, release)
+    print(link)
     page = parser.get_page(link)
 
     return get_player(page, info, player_id)
@@ -73,6 +74,8 @@ def get_basic_info(page):
         - Work Rate
         - Body Type
         - Release Clause
+        - Overall
+        - Potential
     """
     info = {}
     info['Complete Name'] = _get_complete_name(page)
@@ -84,32 +87,52 @@ def get_basic_info(page):
     info['Weight'] = _get_weight(page)
 
     token = r'Value&nbsp;[\n\t]*<span>'
-    info['Value'] = parser.retrieve_in_tags(token, '<', page)[0]
+    info['Value'] = parser.retrieve_in_tags(token, '<', page)
     token = r'Wage&nbsp;[\n\t]*<span>'
-    info['Wage'] = parser.retrieve_in_tags(token, '<', page)[0]
+    info['Wage'] = parser.retrieve_in_tags(token, '<', page)
 
     token = "Preferred Foot</label>"
-    info['Foot'] = parser.retrieve_in_tags(token, '<', page)[0]
+    info['Foot'] = parser.retrieve_in_tags(token, '<', page)
 
     token = "International Reputation</label>"
     info['Intern. Rep.'] = parser.retrieve_in_tags(token, '<',
-                                                   page)[0]
+                                                   page)
 
     token = 'Weak Foot</label>'
     info['Weak Foot'] = parser.retrieve_in_tags(token, '<',
-                                                page)[0]
+                                                page)
 
     token = "Skill Moves</label>"
-    info['Skills Moves'] = parser.retrieve_in_tags(token, '<',
-                                                   page)[0]
-
+    info['Skill Moves'] = parser.retrieve_in_tags(token, '<',
+                                                  page)
     token = "Work Rate</label><span>"
     info['Work Rate'] = parser.retrieve_in_tags(token, '<',
-                                                page)[0]
+                                                page)
 
     token = "Release Clause</label><span>"
     info['Release Clause'] = parser.retrieve_in_tags(token, '<',
-                                                     page)[0]
+                                                     page)
+
+    token = r'class="bp3-tag p p[\d]+">[\d]+</span>.* Overall Rating'
+    token = re.compile(token)
+    aux = parser.get_unparsed_text(page, token)[0]
+    info['Overall'] = parser.retrieve_in_tags('>', '<', aux)
+
+    token = r'class="bp3-tag p p[\d]+">[\d]+</span>.* Potential&nbsp'
+    token = re.compile(token)
+    aux = parser.get_unparsed_text(page, token)[0]
+    info['Potential'] = parser.retrieve_in_tags('>', '<', aux)
+
+    info = _set_none(info)
+
+    return info
+
+
+def _set_none(info):
+    '''Removing from the list the not None Values'''
+    for key in info:
+        if isinstance(info[key], list):
+            info[key] = info[key][0]
 
     return info
 
@@ -129,18 +152,27 @@ def get_tags(page):
 def get_player_team_info(page):
     """ Get the info of teams that a athlete plays."""
 
-    start_token = r'a href="\/team\/[\d]+\/[\w]+\/"'
+    start_token = r'a href="\/team\/[\d]+\/[\w-]+\/"'
     start_token = re.compile(start_token)
-    end_token = "</figure>"
-    pages = parser.retrieve_in_tags(start_token,
-                                    end_token, page)[0]
+    flag = False
+    try:
+        end_token = "</figure>"
+        pages = parser.retrieve_in_tags(start_token,
+                                        end_token, page)[0]
+    except:
+        end_token = '<div class="operation spacing">'
+        pages = parser.retrieve_in_tags(start_token,
+                                        end_token, page)[0]
+        flag = True
+
     team_info = _principal_team_info(pages)
 
     national_info = {"Nat. Team": None,
                      "Jersey Nat.": None,
                      "Nat. Position": None,
                      "Nat. Team Skill": None}
-    if len(pages) >= 2:  # there is a national team
+
+    if not flag:  # there is a national team
         end_token = "/li></ul></div></div>"
         pages = parser.retrieve_in_tags(start_token,
                                         end_token, page)[1]
@@ -252,17 +284,29 @@ def get_sidelines(page):
     start = '<h4 class="bp3-heading">Sidelined</h4>'
     end = '</table></div></article>'
     tokens = ['Description', 'Start Date', 'End Date']
-    add_info = _add_info_parser(start, end, page, tokens)
+    if start in page:
+        add_info = _add_info_parser(start, end, page, tokens)
+    else:
+        return {'History': None}
 
     info = []
-    for index in range(0, len(add_info), 2):
+    index = 0
+    while index < len(add_info)-1:
         sideline = {}
-        sideline['Sideline'] = add_info[index]
-        sideline['Date'] = add_info[index+1]
+        if re.match(r'[\w/ ]*', add_info[index]):
+            sideline['Sideline'] = add_info[index]
+            index += 1
+        if re.match(r'[\d]{2}/[\d]{2}/[\d]{2}', add_info[index]):
+            sideline['Start Date'] = add_info[index]
+            index += 1
+        if re.match(r'[\d]{2}/[\d]{2}/[\d]{2}', add_info[index]):
+            sideline['End Date'] = add_info[index]
+            index += 1
+
         info.append(sideline)
 
     sideline = {}
-    sideline['Sidelines'] = info
+    sideline['History'] = info
 
     return sideline
 
@@ -284,7 +328,7 @@ def get_titles(page):
 
     start = '<h4 class="bp3-heading">Trophies</h4>'
     end = '<div class="spacing">'
-    tokens = ['Club Domestic']
+    tokens = ['Club Domestic', 'National']
     add_info = _add_info_parser(start, end, page, tokens)
 
     info, seasons, titles = [], [], {}
@@ -433,26 +477,28 @@ def _principal_team_info(page):
         Contract
     """
     info = {}
-    info['Team'] = parser.retrieve_in_tags(">", "<", page)[0]
+    info['Team'] = parser.retrieve_in_tags(">", "<", page)
 
     token = r'class="pos pos[\d]*">'
     token = re.compile(token)
     info['Team Position'] = parser.retrieve_in_tags(token,
-                                                    '<', page)[0]
+                                                    '<', page)
 
     token = r'span class="bp3-tag p p[\d]*">'
     token = re.compile(token)
     info['Team Skill'] = parser.retrieve_in_tags(token, '<',
-                                                 page)[0]
+                                                 page)
 
     token = "Jersey Number</label>"
-    info['Jersey'] = parser.retrieve_in_tags(token, "<", page)[0]
+    info['Jersey'] = parser.retrieve_in_tags(token, "<", page)
 
     token = "Joined</label>"
-    info['Joined'] = parser.retrieve_in_tags(token, '<', page)[0]
+    info['Joined'] = parser.retrieve_in_tags(token, '<', page)
 
     token = "Contract Valid Until</label>"
-    info['Contract'] = parser.retrieve_in_tags(token, '<', page)[0]
+    info['Contract'] = parser.retrieve_in_tags(token, '<', page)
+
+    info = _set_none(info)
 
     return info
 
@@ -495,7 +541,10 @@ def _parse_skills(page):
     info = {}
     index = 0
     while index < len(skills) - 1:
-        info[skills[index+1]] = skills[index]
+        if skills[index + 1][0] == ' ':
+            info[skills[index+1][1:]] = skills[index]
+        else:
+            info[skills[index+1]] = skills[index]
         index = index + 2
 
     return info
@@ -511,11 +560,11 @@ def get_pages_changes(player_id):
     token = re.compile(token)
 
     links = set(parser.get_unparsed_text(page, token))
-    release = list(map(lambda x: x.split('/')[-2], links))
+    releases = list(map(lambda x: x.split('/')[-2], links))
     edition = list(map(lambda x: x.split('/')[-3], links))
 
     dict_logs = {}
-    for index in range(0, len(release)):
+    for index, release in enumerate(releases):
         # {release:version}
         dict_logs[release] = edition[index]
 
