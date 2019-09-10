@@ -305,8 +305,17 @@ def get_sidelines(page):
 
         info.append(sideline)
 
+    # sideline['History'] = info All sideline history
+    expulsion, injury = 0, 0
+    for sideline in info:
+        if 'Suspended' in sideline.values():
+            expulsion += 1
+        else:
+            injury += 1
+
     sideline = {}
-    sideline['History'] = info
+    sideline['Expulsions'] = str(expulsion)
+    sideline['Injuries'] = str(injury)
 
     return sideline
 
@@ -358,7 +367,16 @@ def get_titles(page):
             titles['League'] = token.replace('  ', '')
 
     sideline = {}
-    sideline['Competitions'] = info
+    # sideline['Competitions'] = info Here we can get all competition historys
+    win, lose = 0, 0
+    for competition in info:
+        if 'Winner' in competition.keys():
+            win += len(competition['Winner'])
+        else:
+            lose += len(competition['Runner-up'])
+
+    sideline['Win Comp.'] = str(win)
+    sideline['Lose Comp.'] = str(lose)
 
     return sideline
 

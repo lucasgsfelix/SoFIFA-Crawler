@@ -18,5 +18,7 @@ PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release",
            "Interceptions", "Positioning", "Vision", "Penalties",
            "Marking", "Standing Tackle", "Sliding Tackle", "GK Diving",
            "GK Handling", "GK Kicking", "GK Positioning", "GK Reflexes",
-           "Tags", "History", "Competitions", "Nat. Team Skill"]
-# remove Composure
+           "Tags", "Nat. Team Skill", "Win Comp.", "Lose Comp.",
+           "Expulsions", "Injuries"]
+
+# remove Composure, Competitions, History
