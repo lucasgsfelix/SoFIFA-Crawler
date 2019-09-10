@@ -1,4 +1,5 @@
 """ Responsible for the calling of functions. """
+import parser
 import player
 
 
@@ -12,6 +13,7 @@ if __name__ == '__main__':
         players = list(map(lambda x: x.split('\t'),
                                              players))
 
+    header = True
     for player in players:
 
         logs = player.get_pages_changes(players[1])
@@ -19,6 +21,11 @@ if __name__ == '__main__':
             # player id, player name, edition, release
             player_info = parser.get_players_info(player[1],
                                     player[0], logs[log], log)
+
+            parser.write_file(player_info, header)
+            header = False
+
+
 
 
     

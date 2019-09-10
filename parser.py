@@ -1,6 +1,7 @@
 """Responsible to treat all information collected from SoFIFA."""
 import re
 import os
+from header import PLAYERS
 
 
 def mount_query_link(player_name):
@@ -173,3 +174,23 @@ def get_unparsed_text(page, token):
 
     return pages
 
+
+def write_file(info, header=False):
+    """ Write the dataset. """
+    with open("Output/players_info.txt", 'a') as file:
+        if header:
+            _write_header(file, PLAYERS)
+
+        info = list(info.values())
+        # Writing the first features
+        file.write('\t'.join(info) + '\n')
+
+
+def _write_header(file, header):
+    """ Write a header in the dataset. """
+
+    for index, feature in enumerate(header):
+        if index < len(header) - 1:
+            file.write(feature + "\t")
+        else:
+            file.write(feature + "\n")
