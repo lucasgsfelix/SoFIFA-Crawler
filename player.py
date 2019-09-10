@@ -144,7 +144,10 @@ def get_tags(page):
     token = '<div class="mt-2">'
     tags = parser.retrieve_in_tags(token, "</div>", page)[0]
     tags = parser.retrieve_in_tags("#", "<", tags)
-    info['Tags'] = str(len(tags))
+    if tags is not None:
+        info['Tags'] = str(len(tags))
+    else:
+        info['Tags'] = tags
 
     return info
 
