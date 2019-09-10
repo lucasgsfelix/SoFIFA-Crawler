@@ -13,7 +13,8 @@ def get_players_info(player_id, player_name, edition, release):
 
     link = parser.mount_player_link(player_id, edition, release)
     page = parser.get_page(link)
-    get_player(page, info, player_id)
+
+    return get_player(page, info, player_id)
 
 
 def get_player(page, info, player_id):
@@ -510,12 +511,12 @@ def get_pages_changes(player_id):
     token = re.compile(token)
 
     links = set(parser.get_unparsed_text(page, token))
-    logs = list(map(lambda x: x.split('/')[-3],
-                        x.split('/')[-2], links))
+    release = list(map(lambda x: x.split('/')[-2], links))
+    edition = list(map(lambda x: x.split('/')[-3], links))
 
     dict_logs = {}
-    for index in range(0, len(logs), 2):
+    for index in range(0, len(release)):
         # {release:version}
-        dict_logs[logs[index+1]] = logs[index]
+        dict_logs[release] = edition[index]
 
     return dict_logs
