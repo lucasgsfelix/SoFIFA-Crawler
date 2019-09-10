@@ -27,6 +27,14 @@ def mount_player_life_link(player_id):
     return link + '/live'
 
 
+def mount_player_changelog_link(player_id):
+    """Mount a player changelog info."""
+
+    link = "https://sofifa.com/player/" + str(player_id) + '/'
+
+    return link + 'changeLog'
+
+
 def mount_player_comments_link(player_id):
     """ Mount link with comments about the player. """
     link = "https://sofifa.com/player/" + str(player_id)
@@ -164,3 +172,4 @@ def get_unparsed_text(page, token):
     pages = list(map(lambda x: page[x:positions[x]], positions))
 
     return pages
+

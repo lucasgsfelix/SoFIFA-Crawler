@@ -4,12 +4,12 @@ import parser
 
 
 def get_players_info(player_id, player_name, edition, release):
-    """ Responsible to call"""
+    """ Responsible to call all methods"""
     info = {}
-    info['Edition'] = edition
-    info['Release'] = release
     info['Name'] = player_name
     info['Id'] = player_id
+    info['Edition'] = edition
+    info['Release'] = release
 
     link = parser.mount_player_link(player_id, edition, release)
     page = parser.get_page(link)
@@ -483,7 +483,7 @@ def _national_team_info(page):
 
 
 def _parse_skills(page):
-    """ """
+    """Parse players skills . """
     skills = parser.retrieve_in_tags('>', '<', page)
 
     skills = list(filter(lambda x: x != " " and
@@ -498,3 +498,24 @@ def _parse_skills(page):
         index = index + 2
 
     return info
+
+
+def get_pages_changes(player_id):
+    """Get all changelinks of a player."""
+    link = parser.mount_player_changelog_link(player_id)
+    page = parser.get_page(link)
+
+    token = '/player/' + str(player_id) + '/'
+    token += r'[A-z\-]+\/[\d]+\/[\d]+\/'
+    token = re.compile(token)
+
+    links = set(parser.get_unparsed_text(page, token))
+    logs = list(map(lambda x: x.split('/')[-3],
+                        x.split('/')[-2], links))
+
+    dict_logs = {}
+    for index in range(0, len(logs), 2):
+        # {release:version}
+        dict_logs[logs[index+1]] = logs[index]
+
+    return dict_logs
