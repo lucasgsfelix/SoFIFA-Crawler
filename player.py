@@ -14,7 +14,6 @@ def get_players_info(player_id, player_name, edition, release):
     link = parser.mount_player_link(player_id, edition, release)
     print(link)
     page = parser.get_page(link)
-
     return get_player(page, info, player_id)
 
 
@@ -290,7 +289,7 @@ def get_sidelines(page):
     if start in page:
         add_info = _add_info_parser(start, end, page, tokens)
     else:
-        return {'History': None}
+        return {'Expulsions': None, 'Injuries': None}
 
     info = []
     index = 0
@@ -339,54 +338,51 @@ def get_titles(page):
     """Get a player earned titles"""
 
     start = '<h4 class="bp3-heading">Trophies</h4>'
-    end = '<div class="spacing">'
-    tokens = ['Club Domestic', 'National']
-    add_info = _add_info_parser(start, end, page, tokens)
+    tokens = ['Club Domestic', 'National', 'Club International']
+    add_info = _add_info_parser(start, '<div class="spacing">',
+                                page, tokens)
 
-    info, seasons, titles = [], [], {}
+    info, titles, flag, state = [], {}, True, None
     # League, State, \# Winnings, \# Competition, Seasons
-    flag = True
+    seasons_winning, seasons_running = [], []
     for token in add_info:
         if re.match(r'[\d]+x', token):
             #  Will be the number of winning ou runner-up
             continue
-        elif re.match(r'[\d]{4}\/[\d]{4}', token):
+        elif (re.match(r'[\d]{4}\/[\d]{4}', token) or
+              re.match(r'[\d]{4}[ A-z/]*', token)):
             # The season as winner ou runner-up
-            seasons.append(token)
-        elif re.match(r'[\d]{4}', token):
-            # The season as winner ou runner-up
-            seasons.append(token)
+            if state.lower() == 'winner':
+                seasons_winning.append(token)
+            else:
+                seasons_running.append(token)
         elif token.lower() in ('winner', 'runner-up'):
-            # He win a competition
+            # He was in a competition
             state = token
         else:
             # will be name of the competition
             if not flag:
-                titles[state] = seasons
+                titles['Win'] = seasons_winning
+                titles['Runner-Up'] = seasons_running
+                seasons_winning, seasons_running = [], []
                 info.append(titles)
+                state = None
 
             flag = False
-            titles, seasons = {}, []
+            titles = {}
             titles['League'] = token.replace('  ', '')
 
     sideline = {}
     # sideline['Competitions'] = info Here we can get all competition historys
     win, lose = 0, 0
     for competition in info:
-        if 'Winner' in competition.keys():
-            win += len(competition['Winner'])
-        else:
-            lose += len(competition['Runner-up'])
+        win += len(competition['Win'])
+        lose += len(competition['Runner-Up'])
 
     sideline['Win Comp.'] = str(win)
     sideline['Lose Comp.'] = str(lose)
 
     return sideline
-
-
-def get_comments(page):
-    """Get users comments in a player page."""
-    # TODO
 
 
 def get_id_by_name(name):
