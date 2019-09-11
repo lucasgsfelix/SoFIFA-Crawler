@@ -216,3 +216,21 @@ def _write_header(file, header):
             file.write(feature + "\t")
         else:
             file.write(feature + "\n")
+
+
+def parse_date(date):
+    """Parse date from: Jul 1, 2009 to 07/01/2009"""
+    if date is None:
+        return None
+    elif isinstance(date, list):
+        date = ' '.join(date)
+    month = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+             'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+             'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+
+    date = date.split(' ')
+    day = date[1].replace(',', '')
+    if int(day) < 10:
+        day = '0' + day
+
+    return month[date[0]] + '/' + day + '/' + date[2]

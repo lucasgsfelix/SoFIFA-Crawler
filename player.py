@@ -84,7 +84,7 @@ def get_basic_info(page):
     info['Birth Date'] = _get_birth_date(page)
     info['Birth Place'] = _get_birth_place(page)
     info['Height'] = _get_height(page)
-    info['Weight'] = _get_weight(page)
+    info['Weight'] = _get_weight(page).replace('lbs', '')
 
     token = r'Value&nbsp;[\n\t]*<span>'
     info['Value'] = parser.retrieve_in_tags(token, '<', page)
@@ -416,7 +416,7 @@ def _get_position(page):
 
     pos = []
     for position in positions:
-        ans = parser.retrieve_in_tags('>', '<', position)[0]
+        ans = parser.retrieve_in_tags('>', '<', position)
         if ans is not None:
             pos.append(ans)
 
@@ -433,7 +433,7 @@ def _get_birth_date(page):
     re_two = re.compile(r'\)')
     date = parser.retrieve_in_tags(re_one, re_two, date)[0]
 
-    return date
+    return parser.parse_date(date)
 
 
 def _get_edition_release(page):
@@ -445,7 +445,7 @@ def _get_edition_release(page):
     aux.pop(0)  # Removing the tag FIFA
     aux.pop(0)  # Removing the edition
 
-    return ''.join(aux)
+    return parser.parse_date(' '.join(aux))
 
 
 def _get_birth_place(page):
@@ -512,6 +512,7 @@ def _principal_team_info(page):
 
     token = "Joined</label>"
     info['Joined'] = parser.retrieve_in_tags(token, '<', page)
+    info['Joined'] = parser.parse_date(info['Joined'])
 
     token = "Contract Valid Until</label>"
     info['Contract'] = parser.retrieve_in_tags(token, '<', page)
