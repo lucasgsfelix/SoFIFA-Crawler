@@ -30,7 +30,7 @@ def scroll_down(driver, link, player_id):
 
     #  script_down = "bp3-button bp3-minimal bp3-fill pure-button text-center"
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
-    comments = []
+
     cont = 0
     sleep_time = 2
     while True:
@@ -49,7 +49,5 @@ def scroll_down(driver, link, player_id):
             page = driver.page_source
             break
         last_height = new_height
-        comments += parser.parse_comments(page, player_id)
+        parser.parse_comments(page, player_id)
         cont += 1
-
-    return comments

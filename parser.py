@@ -1,6 +1,7 @@
 """Responsible to treat all information collected from SoFIFA."""
 import re
 import os
+from header import COMMENTS
 
 
 class TokenNotFound(Exception):
@@ -263,8 +264,9 @@ def parse_comments(page, player_id):
     upvotes_token = r'<span id="upvote\-[\d]+">[\d]*'
     downvote_token = r'<span id="downvote\-[\d]+">[\d]*'
     comments_token = r'<p>.+'
+    file = "Output/player_comments.txt"
+    header = True
 
-    users = []
     for comment in comments:
         info = {}
         info['Player Id'] = player_id
@@ -285,9 +287,8 @@ def parse_comments(page, player_id):
         info['Downvotes'] = _filter_comment(downvote_token, comment)[0]
         info['Downvotes'] = _parse_votes(info['Downvotes'])
 
-        users.append(info)
-
-    return users
+        write_file(info, COMMENTS, file, header)
+        header = False
 
 
 def _filter_comment(token, comment):
