@@ -271,9 +271,9 @@ def parse_comments(page, player_id):
         info = {}
         info['Player Id'] = player_id
 
-        info['Time'] = _filter_comment(time_token, comment)[0]
-        info['Time'] = retrieve_in_tags('title="', r"\(", info['Time'])[0]
-        info['Time'] = parse_date(info['Time'], True)
+        info['Date'] = _filter_comment(time_token, comment)[0]
+        info['Date'] = retrieve_in_tags('title="', r"\(", info['Date'])[0]
+        info['Date'] = parse_date(info['Date'], True)
 
         info['User'] = comment[0]
 
