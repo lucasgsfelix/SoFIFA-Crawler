@@ -1,6 +1,7 @@
 """ Responsible for the calling of functions. """
 import parser
 import player as pl
+from header import PLAYERS as players_header
 
 
 if __name__ == '__main__':
@@ -23,5 +24,6 @@ if __name__ == '__main__':
                 player_info = pl.get_players_info(player[1],
                                                   player[0], logs[log], log)
 
-                parser.write_file(player_info, HEADER)
+                parser.write_file(player_info, players_header,
+                                  "Output/players_info.txt", HEADER)
                 HEADER = False

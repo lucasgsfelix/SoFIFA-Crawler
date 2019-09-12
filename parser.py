@@ -1,7 +1,6 @@
 """Responsible to treat all information collected from SoFIFA."""
 import re
 import os
-from header import PLAYERS
 
 
 class TokenNotFound(Exception):
@@ -180,23 +179,23 @@ def get_unparsed_text(page, token):
     return pages
 
 
-def write_file(info, header=False):
+def write_file(info, features, file_name, header=False):
     """ Write the dataset. """
 
-    with open("Output/players_info.txt", 'a') as file:
+    with open(file_name, 'a') as file:
         if header:
-            _write_header(file, PLAYERS)
+            _write_header(file, features)
 
         # info = list(info.values())
         # Writing the first features
-        for index, feature in enumerate(PLAYERS):
+        for index, feature in enumerate(features):
             if isinstance(info[feature], list):
                 try:
                     info[feature] = ' '.join(info[feature])
                 except:
                     info[feature] = str(info[feature])
 
-            if index < len(PLAYERS) - 1:
+            if index < len(features) - 1:
                 if info[feature] is not None:
                     file.write(info[feature] + "\t")
                 else:
@@ -231,7 +230,6 @@ def parse_date(date, parse=False):
         date = list(filter(lambda x: x in month
                            or re.match(r'[\d]+', x), date.split(' ')))
 
-
     if isinstance(date, list):
         date = ' '.join(date)
 
@@ -243,7 +241,7 @@ def parse_date(date, parse=False):
     return month[date[0]] + '/' + day + '/' + date[2]
 
 
-def parse_comments(page):
+def parse_comments(page, player_id):
     """Responsible to return the parsed comments about a player.
        This function will get:
         - User name
@@ -261,7 +259,7 @@ def parse_comments(page):
                         comments))
 
     time_token = r'<div id="commento\-comment\-timeago\-[\d]+"'
-    #link_token = r'.* href="/user/[\d]+"'
+    # link_token = r'.* href="/user/[\d]+"'
     upvotes_token = r'<span id="upvote\-[\d]+">[\d]*'
     downvote_token = r'<span id="downvote\-[\d]+">[\d]*'
     comments_token = r'<p>.+'
@@ -269,6 +267,7 @@ def parse_comments(page):
     users = []
     for comment in comments:
         info = {}
+        info['Player Id'] = player_id
 
         info['Time'] = _filter_comment(time_token, comment)[0]
         info['Time'] = retrieve_in_tags('title="', r"\(", info['Time'])[0]

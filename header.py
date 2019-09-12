@@ -21,4 +21,6 @@ PLAYERS = ["Name", "Complete Name", "Id", "Edition", "Release",
            "Tags", "Nat. Team Skill", "Win Comp.", "Lose Comp.",
            "Expulsions", "Injuries"]
 
+COMMENTS = ['Player Id', 'User', 'Date', 'Upvotes', 'Downvotes', 'Comment']
+
 # remove Composure, Competitions, History
