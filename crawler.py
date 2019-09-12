@@ -1,8 +1,12 @@
+"""Responsible to call the browser to collect javascript comments"""
 import time
-
+import parser
 
 class TimeOutException(Exception):
     """ Time out Exception Class."""
+
+class ElementNotFound(Exception):
+    """ Element not Found Exception Class."""
 
 
 def scroll_down(driver, link):
@@ -10,11 +14,6 @@ def scroll_down(driver, link):
 
     driver.get(link)
     time.sleep(5)
-    driver.switch_to.frame(driver.find_element_by_tag_name("is-preload"))
-    html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
-    print(html)
-    print("OIOIO")
-    exit()
     try:
         driver.get(link)
     except TimeOutException:
@@ -22,30 +21,26 @@ def scroll_down(driver, link):
         driver.refresh()
         driver.get(link)
 
-    try:
-        html = driver.page_source
-    except:
-        script = "return document.getElementsByTagName"
-        script += "('html')[0].innerHTML"
-        html = driver.execute_script(script)
+    page = driver.page_source
 
     script_height = "return document.body.scrollHeight"
     last_height = driver.execute_script(script_height)
 
-    script_down = "bp3-button bp3-minimal"
-    script_down += "bp3-fill pure-button text-center"
+    #  script_down = "bp3-button bp3-minimal bp3-fill pure-button text-center"
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
 
     while True:
         driver.execute_script(scroll_script)
         try:
-            driver.find_element_by_class_name(script_down).click()
-        except:
-            pass
+            driver.find_element_by_id("commento-footer").click()
+        except ElementNotFound:
+            raise "Element not found."
+
         time.sleep(2)
 
         new_height = driver.execute_script(script_height)
         if new_height == last_height:
-            html = driver.page_source
+            page = driver.page_source
             break
         last_height = new_height
+        parser.parse_comments(page)

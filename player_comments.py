@@ -1,8 +1,7 @@
 """ Module responsible to collect all coments about a player. """
-import crawler
 import parser
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import crawler
 
 
 def get_comments(player_id):

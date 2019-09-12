@@ -218,17 +218,22 @@ def _write_header(file, header):
             file.write(feature + "\n")
 
 
-def parse_date(date):
+def parse_date(date, parse=False):
     """Parse date from: Jul 1, 2009 to 07/01/2009"""
     if date is None:
         return None
 
-    if isinstance(date, list):
-        date = ' '.join(date)
-
     month = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
              'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
              'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+
+    if parse:
+        date = list(filter(lambda x: x in month
+                           or re.match(r'[\d]+', x), date.split(' ')))
+
+
+    if isinstance(date, list):
+        date = ' '.join(date)
 
     date = date.split(' ')
     day = date[1].replace(',', '')
@@ -236,3 +241,64 @@ def parse_date(date):
         day = '0' + day
 
     return month[date[0]] + '/' + day + '/' + date[2]
+
+
+def parse_comments(page):
+    """Responsible to return the parsed comments about a player.
+       This function will get:
+        - User name
+        - User link (??)
+        - Upvotes
+        - Downvotes
+        - Datetime
+        - Comment
+
+    """
+    start = 'id="commento-comment-name-'
+    end = 'Reply</button>'
+    comments = retrieve_in_tags(start, end, page)
+    comments = list(map(lambda x: retrieve_in_tags('>', '<', x),
+                        comments))
+
+    time_token = r'<div id="commento\-comment\-timeago\-[\d]+"'
+    #link_token = r'.* href="/user/[\d]+"'
+    upvotes_token = r'<span id="upvote\-[\d]+">[\d]*'
+    downvote_token = r'<span id="downvote\-[\d]+">[\d]*'
+    comments_token = r'<p>.+'
+
+    users = []
+    for comment in comments:
+        info = {}
+
+        info['Time'] = _filter_comment(time_token, comment)[0]
+        info['Time'] = retrieve_in_tags('title="', r"\(", info['Time'])[0]
+        info['Time'] = parse_date(info['Time'], True)
+
+        info['User'] = comment[0]
+
+        info['Comment'] = _filter_comment(comments_token, comment)
+        info['Comment'] = ' '.join(list(map(lambda x: x.replace('<p>', ''),
+                                            info['Comment'])))
+
+        info['Upvotes'] = _filter_comment(upvotes_token, comment)[0]
+        info['Upvotes'] = _parse_votes(info['Upvotes'])
+
+        info['Downvotes'] = _filter_comment(downvote_token, comment)[0]
+        info['Downvotes'] = _parse_votes(info['Downvotes'])
+
+        users.append(info)
+
+    return users
+
+
+def _filter_comment(token, comment):
+    """ Filtering the comment. """
+    return list(filter(lambda x: re.match(token, x), comment))
+
+
+def _parse_votes(vote):
+    """ Parsing the upvotes and downvotes. """
+    vote = re.sub('.*>', '', vote)
+    if vote == '':
+        return '0'
+    return vote
