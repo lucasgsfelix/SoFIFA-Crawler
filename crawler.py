@@ -31,6 +31,8 @@ def scroll_down(driver, link, player_id):
     #  script_down = "bp3-button bp3-minimal bp3-fill pure-button text-center"
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
     comments = []
+    cont = 0
+    sleep_time = 2
     while True:
         driver.execute_script(scroll_script)
         try:
@@ -38,7 +40,9 @@ def scroll_down(driver, link, player_id):
         except ElementNotFound:
             raise "Element not found."
 
-        time.sleep(2)
+        if cont % 10 == 0:
+            sleep_time += 1
+        time.sleep(sleep_time)
 
         new_height = driver.execute_script(script_height)
         if new_height == last_height:
@@ -46,5 +50,6 @@ def scroll_down(driver, link, player_id):
             break
         last_height = new_height
         comments += parser.parse_comments(page, player_id)
+        cont += 1
 
-    return set(comments)
+    return comments

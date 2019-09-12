@@ -11,5 +11,6 @@ def get_comments(player_id, header=False):
     link = parser.mount_player_comments_link(player_id)
     player_comments = crawler.scroll_down(driver, link, player_id)
     file = "Output/player_comments.txt"
-    parser.write_file(player_comments, file, COMMENTS_HEADER, header)
+    map(lambda x: parser.write_file(x, COMMENTS_HEADER, file, header),
+    												player_comments)
     driver.close()
