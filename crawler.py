@@ -32,18 +32,16 @@ def scroll_down(driver, link, player_id):
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
 
     cont = 0
-    sleep_time = 2
+    sleep_time = 4
     while True:
         driver.execute_script(scroll_script)
         try:
             driver.find_element_by_id("commento-footer").click()
-        except ElementNotFound:
-            raise "Element not found."
+        except:
+            pass
 
-        if cont % 10 == 0:
-            sleep_time += 1
         time.sleep(sleep_time)
-
+        page = driver.page_source
         new_height = driver.execute_script(script_height)
         if new_height == last_height:
             page = driver.page_source

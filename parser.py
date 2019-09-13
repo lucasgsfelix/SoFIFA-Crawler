@@ -236,7 +236,7 @@ def parse_date(date, parse=False):
 
     date = date.split(' ')
     day = date[1].replace(',', '')
-    if int(day) < 10:
+    if int(day) < 10 and '0' not in day:
         day = '0' + day
 
     return month[date[0]] + '/' + day + '/' + date[2]
