@@ -31,21 +31,21 @@ def scroll_down(driver, link, player_id):
     #  script_down = "bp3-button bp3-minimal bp3-fill pure-button text-center"
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
 
-    cont = 0
-    sleep_time = 4
     while True:
-        driver.execute_script(scroll_script)
+
         try:
+            driver.execute_script(scroll_script)
             driver.find_element_by_id("commento-footer").click()
         except:
             pass
 
-        time.sleep(sleep_time)
-        page = driver.page_source
+        time.sleep(2)
         new_height = driver.execute_script(script_height)
         if new_height == last_height:
             page = driver.page_source
             break
         last_height = new_height
-        parser.parse_comments(page, player_id)
-        cont += 1
+
+
+    page = driver.page_source
+    parser.parse_comments(page, player_id)
