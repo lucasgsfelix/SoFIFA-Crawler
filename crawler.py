@@ -1,4 +1,5 @@
 """Responsible to call the browser to collect javascript comments"""
+import json
 import time
 import parser
 
@@ -30,22 +31,37 @@ def scroll_down(driver, link, player_id):
 
     #  script_down = "bp3-button bp3-minimal bp3-fill pure-button text-center"
     scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
-
+    sleep_time = 0
+    start = time.time()
     while True:
 
         try:
             driver.execute_script(scroll_script)
             driver.find_element_by_id("commento-footer").click()
         except:
-            pass
+            sleep_time+=1
 
-        time.sleep(2)
-        new_height = driver.execute_script(script_height)
-        if new_height == last_height:
-            page = driver.page_source
+        try:
+            time.sleep(2 + sleep_time)
+            new_height = driver.execute_script(script_height)
+
+            if new_height == last_height:
+                driver.execute_script(scroll_script)
+                driver.find_element_by_id("commento-footer").click()
+                driver.execute_script(scroll_script)
+                driver.find_element_by_id("commento-footer").click()
+                if new_height == driver.execute_script(script_height):
+                    page = driver.page_source 
+                    break
+
+            last_height = new_height
+
+        except:
+            sleep_time+=1
+
+        if time.time() - start == 300:
             break
-        last_height = new_height
-
 
     page = driver.page_source
-    parser.parse_comments(page, player_id)
+    page = json.dumps(page).replace(u'\\u003C', '<').replace(u'\\u003E', '>')
+    parser.parse_comments(page.replace('\\', ''), player_id)
