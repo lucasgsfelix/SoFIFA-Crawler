@@ -59,9 +59,6 @@ def scroll_down(driver, link, player_id):
         except:
             sleep_time+=1
 
-        if time.time() - start == 300:
-            break
-
     page = driver.page_source
     page = json.dumps(page).replace(u'\\u003C', '<').replace(u'\\u003E', '>')
     parser.parse_comments(page.replace('\\', ''), player_id)
