@@ -4,15 +4,21 @@ import player as pl
 from header import PLAYERS as players_header
 
 
-if __name__ == '__main__':
-
+def read_file():
+    """Will return the list of player to be collected"""
     with open("Input/players_list.txt", 'r') as file:
-        PLAYERS = file.read().split('\n')
-        PLAYERS.pop(0)  # removing header
+        players = file.read().split('\n')
+        players.pop(0)  # removing header
 
         # 0 - players name, 1 - players id
-        PLAYERS = list(map(lambda x: x.split('\t'),
-                           PLAYERS))
+        players = list(map(lambda x: x.split('\t'),
+                           players))
+    return players
+
+
+if __name__ == '__main__':
+
+    PLAYERS = read_file()
 
     HEADER = True
     for player in PLAYERS:

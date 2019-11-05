@@ -242,7 +242,7 @@ def parse_date(date, parse=False):
     return month[date[0]] + '/' + day + '/' + date[2]
 
 
-def parse_comments(page, player_id):
+def parse_comments(page, player_id, num_comments=False):
     """Responsible to return the parsed comments about a player.
        This function will get:
         - User name
@@ -256,9 +256,12 @@ def parse_comments(page, player_id):
     start = 'id="commento-comment-name-'
     end = 'Reply</button>'
     comments = retrieve_in_tags(start, end, page)
+    if comments is None:
+        arq = open("saida.txt", 'w')
+        arq.write(page)
+        arq.close()
     comments = list(map(lambda x: retrieve_in_tags('>', '<', x),
                         comments))
-
     time_token = r'<div id="commento\-comment\-timeago\-[\d]+"'
     # link_token = r'.* href="/user/[\d]+"'
     upvotes_token = r'<span id="upvote\-[\d]+">[\d]*'
@@ -266,6 +269,9 @@ def parse_comments(page, player_id):
     comments_token = r'<p>.+'
     file = "Output/player_comments.txt"
     header = True
+
+    if num_comments:
+        return len(comments)
 
     for comment in comments:
         info = {}
@@ -289,6 +295,8 @@ def parse_comments(page, player_id):
 
         write_file(info, COMMENTS, file, header)
         header = False
+
+    return True
 
 
 def _filter_comment(token, comment):
